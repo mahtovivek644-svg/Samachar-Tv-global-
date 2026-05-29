@@ -1,0 +1,6 @@
+{
+  "name": "Samachar TV Global",
+  "description": "Watch Bihar, Jharkhand, and India breaking news with interactive category feeds and dynamic updates.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
