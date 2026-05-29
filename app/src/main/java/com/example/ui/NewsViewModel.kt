@@ -33,6 +33,41 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
     private val _currentActiveNews = MutableStateFlow<NewsItem?>(null)
     val currentActiveNews: StateFlow<NewsItem?> = _currentActiveNews.asStateFlow()
 
+    // --- Reporter Profile States with SharedPreferences Persistence ---
+    private val sharedPrefs = application.getSharedPreferences("reporter_profile_prefs", android.content.Context.MODE_PRIVATE)
+
+    private val _reporterName = MutableStateFlow(sharedPrefs.getString("reporter_name", "Vivek Mahto") ?: "Vivek Mahto")
+    val reporterName: StateFlow<String> = _reporterName.asStateFlow()
+
+    private val _reporterGmail = MutableStateFlow(sharedPrefs.getString("reporter_gmail", "mahtovivek644@gmail.com") ?: "mahtovivek644@gmail.com")
+    val reporterGmail: StateFlow<String> = _reporterGmail.asStateFlow()
+
+    private val _reporterContact = MutableStateFlow(sharedPrefs.getString("reporter_contact", "+91 94311 00223") ?: "+91 94311 00223")
+    val reporterContact: StateFlow<String> = _reporterContact.asStateFlow()
+
+    private val _reporterEmail = MutableStateFlow(sharedPrefs.getString("reporter_email", "mahtovivek644@gmail.com") ?: "mahtovivek644@gmail.com")
+    val reporterEmail: StateFlow<String> = _reporterEmail.asStateFlow()
+
+    private val _reporterPassword = MutableStateFlow(sharedPrefs.getString("reporter_password", "Admin@789") ?: "Admin@789")
+    val reporterPassword: StateFlow<String> = _reporterPassword.asStateFlow()
+
+    fun updateProfile(name: String, gmail: String, contact: String, email: String, pass: String) {
+        _reporterName.value = name
+        _reporterGmail.value = gmail
+        _reporterContact.value = contact
+        _reporterEmail.value = email
+        _reporterPassword.value = pass
+
+        sharedPrefs.edit().apply {
+            putString("reporter_name", name)
+            putString("reporter_gmail", gmail)
+            putString("reporter_contact", contact)
+            putString("reporter_email", email)
+            putString("reporter_password", pass)
+            apply()
+        }
+    }
+
     // --- System Language Features ---
     private val _currentLanguage = MutableStateFlow("English")
     val currentLanguage: StateFlow<String> = _currentLanguage.asStateFlow()
