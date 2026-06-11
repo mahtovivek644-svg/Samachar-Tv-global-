@@ -449,6 +449,7 @@ fun BroadcastLivePlayer(
     onTogglePlay: () -> Unit,
     onToggleMute: () -> Unit
 ) {
+    val context = LocalContext.current
     // Pulse animation setup
     val infiniteTransition = rememberInfiniteTransition(label = "player_infinite")
     val waveScale by infiniteTransition.animateFloat(
@@ -742,20 +743,63 @@ fun BroadcastLivePlayer(
                             }
                         }
 
-                        // Playback duration status with localization
+                        // Playback duration status with localization and Share action
                         val playLabel = if (isPlaying) {
                             "00:23 | " + AppLocalizer.getString("l_broadcast", currentLanguage)
                         } else {
                             AppLocalizer.getString("p_broadcast", currentLanguage)
                         }
 
-                        Text(
-                            text = playLabel,
-                            color = Color.White.copy(alpha = 0.7f),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier.padding(end = 4.dp)
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    val shareText = if (activeItem != null) {
+                                        """
+                                            🔥 SAMACHAR TV LIVE VIDEOCAST 🔥
+                                            Direct Broadcast: ${activeItem.title}
+                                            Category: ${activeItem.category.uppercase()}
+                                            
+                                            🎥 Tuning into regional Jharkhand transmission. Watch with hundreds of other residents live!
+                                        """.trimIndent()
+                                    } else {
+                                        """
+                                            🎥 SAMACHAR TV RANCHI BROADCAST 🎥
+                                            Tuning live to our primary community news satellite feed!
+                                            
+                                            👉 Tune in to see your colony logs, public welfare alerts, and live residential broadcasts.
+                                        """.trimIndent()
+                                    }
+                                    val sendIntent = android.content.Intent().apply {
+                                        action = android.content.Intent.ACTION_SEND
+                                        putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+                                        type = "text/plain"
+                                    }
+                                    val shareIntent = android.content.Intent.createChooser(sendIntent, "Share Video Broadcast via")
+                                    context.startActivity(shareIntent)
+                                },
+                                modifier = Modifier.size(28.dp).testTag("share_video_button")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Share,
+                                    contentDescription = "Share live video feed",
+                                    tint = Color.White.copy(alpha = 0.85f),
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                            
+                            Spacer(modifier = Modifier.width(2.dp))
+
+                            Text(
+                                text = playLabel,
+                                color = Color.White.copy(alpha = 0.7f),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }
@@ -913,6 +957,7 @@ fun NewsCard(
     onToggleBookmark: () -> Unit,
     onDelete: () -> Unit
 ) {
+    val context = LocalContext.current
     val cardBg = if (isActiveOnScreen) {
         MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
     } else {
@@ -1103,6 +1148,30 @@ fun NewsCard(
                                     imageVector = if (newsItem.isBookmarked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                     contentDescription = "Bookmark story",
                                     tint = if (newsItem.isBookmarked) NewsRed else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            // Share news dispatch Button
+                            IconButton(onClick = {
+                                val shareText = """
+                                    📰 SAMACHAR TV DISPATCH 📰
+                                    [${newsItem.category.uppercase()}] ${texts.title}
+                                    ${texts.subtitle}
+                                    
+                                    👉 Read more about this breaking story on our Ranchi residential division channels!
+                                """.trimIndent()
+                                val sendIntent = android.content.Intent().apply {
+                                    action = android.content.Intent.ACTION_SEND
+                                    putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+                                    type = "text/plain"
+                                }
+                                val shareIntent = android.content.Intent.createChooser(sendIntent, "Share News via")
+                                context.startActivity(shareIntent)
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Share,
+                                    contentDescription = "Share news story",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -2552,6 +2621,52 @@ fun ColonyAndProfileTabContent(
                         fontWeight = FontWeight.Bold,
                         color = Color.White.copy(alpha = 0.5f)
                     )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+                Divider(color = Color.White.copy(alpha = 0.12f))
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    onClick = {
+                        val shareText = """
+                            📰 SAMACHAR TV PRESS ID CARD 📰
+                            Reporter Name: $currentName
+                            Designation: Senior Jharkhand Journalist
+                            Contact Hotline: $currentContact
+                            Access Email: $currentGmail (RANCHI HUB)
+                            Residential Colony Affiliation: $selectedColony
+                            Status: VERIFIED PRESS SQUAD ON-DUTY
+                        """.trimIndent()
+                        val sendIntent = android.content.Intent().apply {
+                            action = android.content.Intent.ACTION_SEND
+                            putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+                            type = "text/plain"
+                        }
+                        val shareIntent = android.content.Intent.createChooser(sendIntent, "Share Profile Via")
+                        context.startActivity(shareIntent)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD700)),
+                    modifier = Modifier.fillMaxWidth().testTag("share_profile_id_btn"),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share Profile Icon",
+                            tint = Color.Black,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = "SHARE PRESS ID PROFILE",
+                            fontWeight = FontWeight.Black,
+                            fontSize = 11.sp,
+                            color = Color.Black
+                        )
+                    }
                 }
             }
         }
